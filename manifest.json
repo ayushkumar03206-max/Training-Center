@@ -1,12 +1,38 @@
 {
-  "name": "Brand Banao Training",
-  "short_name": "BB Training",
+  "id": "/",
+  "name": "Training Center",
+  "short_name": "Training Center",
+  "description": "Training Center by Brand Banao: interactive quizzes on GD&T symbols, quality terminology, safety signs, electrical symbols, measurement instruments and ISO standards.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0f1f4d",
+  "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "background_color": "#ffffff",
   "theme_color": "#0f1f4d",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "tc-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "tc-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "tc-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
