@@ -109,6 +109,15 @@ footer{text-align:center; margin-top:24px;}
 footer a{color:var(--accent2); font-size:.85rem; text-decoration:none; font-weight:600;}
 footer a:hover{text-decoration:underline;}
 .hidden{display:none;}
+.disclaimer{margin:18px 0 8px; padding:10px 2px 2px; border-top:1px solid var(--line); text-align:center; font-size:.74rem; color:var(--sub);}
+.disclaimer a{color:var(--sub); text-decoration:underline; margin:0 7px; cursor:pointer;}
+.discBox h3{margin:12px 0 4px; font-size:.9rem;}
+.discBox p{margin:0 0 8px; font-size:.82rem; line-height:1.55;}
+.reportBox{background:var(--card); border:1px solid var(--line); border-left:4px solid #25a244; border-radius:8px; padding:10px 12px; margin-top:6px;}
+.reportBtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.reportBtns a{display:inline-block; padding:8px 13px; border-radius:8px; font-size:.78rem; font-weight:700; text-decoration:none;}
+.reportBtns .wa{background:#25a244; color:#fff;}
+.reportBtns .web{border:1px solid var(--accent2); color:var(--accent2);}
 .installBar{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:12px 0 2px; padding:11px 14px; border-radius:12px; background:linear-gradient(135deg,#2f6fed,#16215c); color:#fff; font-size:.88rem; cursor:pointer; box-shadow:0 4px 14px rgba(47,111,237,.35);}
 .installBar.hidden{display:none;}
 .installGo{background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.5); padding:4px 12px; border-radius:16px; font-weight:700; white-space:nowrap;}
@@ -286,6 +295,8 @@ footer a:hover{text-decoration:underline;}
   </div>
 
   <footer>🌐 <a href="https://brandbanaoio.lovable.app/" target="_blank" rel="noopener">brandbanao.io — visit our website →</a></footer>
+
+  <div class="disclaimer" id="disclaimer"><a href="#" id="discLink" onclick="openDisclaimer(); return false;">Disclaimer &amp; sources</a><span>·</span><a id="reportWa" href="https://wa.me/918192913216" target="_blank" rel="noopener" onclick="this.href=reportLink()">Report an error</a></div>
 </div>
 
 <script>
@@ -1399,11 +1410,15 @@ function platformInfo(){
   return { ios:/iPhone|iPad|iPod/.test(ua), android:/Android/.test(ua),
            inApp:/FBAN|FBAV|Instagram|MicroMessenger|WhatsApp|Snapchat|Telegram|Line\/|; wv\)/i.test(ua) };
 }
+function markInstalled(on){ try{ if(on) localStorage.setItem('bb_installed','1'); else localStorage.removeItem('bb_installed'); }catch(e){} }
 function updateInstallBar(){
-  const bar = document.getElementById('installBar'); if(bar) bar.classList.toggle('hidden', isStandalone());
+  if(isStandalone()) markInstalled(true);                    // running as the installed app -> remember it
+  const bar = document.getElementById('installBar');
+  if(bar) bar.classList.toggle('hidden', isStandalone() || localStorage.getItem('bb_installed')==='1');
 }
-window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredInstall = e; updateInstallBar(); });
-window.addEventListener('appinstalled', ()=>{ deferredInstall = null; const bar = document.getElementById('installBar'); if(bar) bar.classList.add('hidden'); showToast('✅','App installed','Open it from your home screen.'); });
+// the browser only offers the install prompt when the app is NOT installed -> then show the bar again (e.g. after uninstall)
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredInstall = e; markInstalled(false); updateInstallBar(); });
+window.addEventListener('appinstalled', ()=>{ deferredInstall = null; markInstalled(true); updateInstallBar(); showToast('✅','App installed','Open it from your home screen.'); });
 async function installApp(){
   if(deferredInstall){
     try{
@@ -1429,6 +1444,47 @@ function openInstallHelp(){
   document.body.appendChild(ov);
 }
 function closeInstallHelp(){ const o = document.getElementById('installHelp'); if(o) o.remove(); }
+
+// ===== DISCLAIMER POPUP (opened from the small link at the bottom) =====
+function openDisclaimer(){
+  closeDisclaimer();
+  const ov = document.createElement('div'); ov.className = 'promoOverlay'; ov.id = 'disclaimerPopup';
+  ov.innerHTML = `<div class="promoBox"><div class="helpBox discBox">
+    <h2>Disclaimer &amp; sources</h2>
+    <h3>Disclaimer</h3><p>Training Center is a learning aid made by Brand Banao. The content is simplified and written in our own words from the references below and general industry practice. It is <b>not official</b>, is not a substitute for the standards themselves, and must not be used for certification, audits or safety-critical decisions. Always follow the current official standards and your organisation's procedures. Brand Banao is not affiliated with ISO, IEC, ASME, IATF, AIAG or any other body named here; all names belong to their owners.</p>
+    <h3>Sources / references</h3><p><b>GD&amp;T:</b> ASME Y14.5 terminology (ISO 1101 for legacy items) · <b>Safety signs:</b> ISO 7010 categories and colours (emoji are simplified, not the official pictograms) · <b>Electrical:</b> IEC 60617-style symbols · <b>Standards:</b> ISO 9001, 14001, 45001, 22000, 50001, 31000, 26000, 13485, ISO/IEC 27001, 17025, 20000-1 and IATF 16949 · <b>Quality terms:</b> common industry usage (e.g. AIAG core tools: APQP, PPAP, FMEA, MSA, SPC) · <b>Measurement:</b> standard metrology practice. Some groupings (like quality-term categories) are this app's own and are marked as such.</p>
+    <div class="reportBox"><b style="color:var(--ink)">Found an error, or a question that is misleading or wrong?</b><br>Tell us directly and we will check and fix it. If you are on a question, its details are added to your message automatically.
+      <div class="reportBtns">
+        <a class="wa" id="reportWa2" href="https://wa.me/918192913216" target="_blank" rel="noopener" onclick="this.href=reportLink()">💬 Report on WhatsApp</a>
+        <a class="web" href="https://brandbanaoio.lovable.app/" target="_blank" rel="noopener">🌐 Contact via website</a>
+      </div></div>
+    <div class="promoCta"><button type="button">Close</button></div></div></div>`;
+  ov.querySelector('.promoCta button').onclick = closeDisclaimer;
+  ov.addEventListener('click', e=>{ if(e.target===ov) closeDisclaimer(); });
+  document.body.appendChild(ov);
+}
+function closeDisclaimer(){ const o = document.getElementById('disclaimerPopup'); if(o) o.remove(); }
+
+// ===== REPORT AN ERROR (WhatsApp message, pre-filled with the question the user is looking at) =====
+const CONTACT_WA = "918192913216";
+function reportLink(){
+  let msg = 'Training Center – report an error\n';
+  try{
+    const inQuiz = !document.getElementById('quizScreen').classList.contains('hidden');
+    if(inQuiz && currentTier && currentModKey){
+      msg += `Module: ${MODULES[currentModKey].title}\nLevel: ${currentTier.name} (${currentTier.sub})\n`;
+      const item = currentTier.data[order[qi]];
+      if(item && !document.querySelector('#quizArea .results')){
+        const d = document.createElement('div'); d.innerHTML = currentTier.front(item);
+        d.querySelectorAll('.fineNote').forEach(x=>x.remove());
+        const stem = [...d.children].map(c=>c.textContent.replace(/\s+/g,' ').trim()).filter(Boolean).join(' — ');
+        if(stem) msg += `Question: ${stem.slice(0,300)}\n`;
+      }
+    }
+  }catch(e){}
+  msg += '\nWhat is wrong / misleading:\n';
+  return `https://wa.me/${CONTACT_WA}?text=${encodeURIComponent(msg)}`;
+}
 
 function openProfile(){
   document.getElementById('home').classList.add('hidden');
